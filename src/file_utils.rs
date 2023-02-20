@@ -1,7 +1,22 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::path::Path;
 
 pub fn read_file(input_filename: &str) -> Result<Vec<String>, std::io::Error> {
+    let path = Path::new(input_filename);
+    if !path.exists() {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            format!("File not found: {}", path.display()),
+        ));
+    }
+    if !path.is_file() {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("{} is not a file.", path.display()),
+        ));
+    }
+
     let file = File::open(input_filename)?;
     let reader = BufReader::new(file);
     let lines: Vec<String> = reader.lines().map(|line| line.unwrap()).collect();
